@@ -4,7 +4,8 @@
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"
           rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 </head>
 <body ng-app="app">
 
@@ -13,7 +14,7 @@
      ng-controller="appController">
     <div class="row">
         <div class="col-md-12">
-            <h4>Input card sequence</h4>
+            <h4>Desired output card sequence</h4>
             <p>
                 (H1 (Hearts 1), DK (Diamond King), CJ (Clubs Joker), S3 (Spades 3))
             </p>
@@ -85,7 +86,7 @@
 
             <hr>
 
-            <h4>Output card sequence</h4>
+            <h4>Starting card sequence</h4>
             <div style="height: 5px"></div>
             <div style="margin-top: 5px;">
                 <div ng-repeat="c in solvedOutput track by $index"
