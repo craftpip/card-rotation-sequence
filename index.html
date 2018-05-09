@@ -65,10 +65,12 @@
                 <div ng-repeat="c in parsedInput track by $index"
                      class="c">
                     <div class="t">
-                        <span ng-if="getCardType(c) == 'h'">
+                        <span ng-if="getCardType(c) == 'h'"
+                              style="color: crimson">
                             &heartsuit;
                         </span>
-                        <span ng-if="getCardType(c) == 'd'">
+                        <span ng-if="getCardType(c) == 'd'"
+                              style="color: crimson">
                             &diamondsuit;
                         </span>
                         <span ng-if="getCardType(c) == 'c'">
@@ -86,16 +88,18 @@
 
             <hr>
 
-            <h4>Starting card sequence </h4>
+            <h4>Starting card sequence <span ng-if="solving">(Solving)</span> </h4>
             <div style="height: 5px"></div>
             <div style="margin-top: 5px;">
                 <div ng-repeat="c in solvedOutput track by $index"
                      class="c">
                     <div class="t">
-                        <span ng-if="getCardType(c) == 'h'">
+                        <span ng-if="getCardType(c) == 'h'"
+                              style="color: crimson">
                             &heartsuit;
                         </span>
-                        <span ng-if="getCardType(c) == 'd'">
+                        <span ng-if="getCardType(c) == 'd'"
+                              style="color: crimson">
                             &diamondsuit;
                         </span>
                         <span ng-if="getCardType(c) == 'c'">
@@ -123,13 +127,26 @@
 
             <h4>How does it work?</h4>
 
+            <p>
+                Lets assume i have a stack of 10 cards, arranged in a secret sequence (Starting card sequence).
+            </p>
             <ul>
-                <li>1. Arrange your cards as shown in the Output card sequence.</li>
-                <li>2. Take out one card from the top of the stack.</li>
-                <li>3. Move the top card to the bottom of the same stack.</li>
-                <li>4. Repeat from step 2, until no cards are left.</li>
-                <li>5. You've got yourself The input card sequence.</li>
+                <li>1. Take one card out of the stack, and place it on the table.</li>
+                <li>2. Take another card out of the stack and place it at the bottom of the same stack.</li>
+                <li>3. Goto step 1, and repeat until all cards are over.</li>
             </ul>
+            <p>
+                The cards on the table are in sequential order.
+            </p>
+            <p>
+                This program generates the card sequence required to get the desired output.
+            </p>
+            <p>
+                Thanks to a friend @pranav <br>
+                Fork it @ <a href="https://github.com/craftpip/card-rotation-sequence">https://github.com/craftpip/card-rotation-sequence</a>
+                <br>
+                License MIT
+            </p>
         </div>
     </div>
 </div>
@@ -165,6 +182,7 @@
 
     .c > div:nth-child(2) {
         text-transform: uppercase;
+        font-weight: bold;
     }
 </style>
 <script>
@@ -175,6 +193,7 @@
             $scope.parsedInput = '';
             $scope.inputDuplicates = false;
             $scope.solvedOutput = [];
+            $scope.solving = false;
 
             $scope.parseInput = function(input){
                 if(!input || input.trim() == ''){
@@ -192,8 +211,11 @@
                     });
                 });
 
+                $scope.solving = true;
+
                 $timeout(function(){
                     $scope.solvedOutput = $scope.solve($scope.parsedInput);
+                    $scope.solving = false;
                 }, 100);
             };
 
@@ -283,7 +305,6 @@
                 }
 
                 $scope.rotations = parts;
-
 
                 return f;
             }
