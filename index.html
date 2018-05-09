@@ -86,7 +86,7 @@
 
             <hr>
 
-            <h4>Starting card sequence</h4>
+            <h4>Starting card sequence </h4>
             <div style="height: 5px"></div>
             <div style="margin-top: 5px;">
                 <div ng-repeat="c in solvedOutput track by $index"
@@ -111,6 +111,14 @@
                 </div>
             </div>
 
+
+            <div style="margin-top: 10px;">Number of required rotations on total {{solvedOutput.length}} cards</div>
+            <div ng-repeat="r in rotations track by $index">
+                <span>{{r.length}} - </span>
+                <span ng-repeat="r2 in r track by $index">
+                        {{$index ? ',' : ''}}{{r2}}
+                </span>
+            </div>
             <hr>
 
             <h4>How does it work?</h4>
@@ -186,7 +194,7 @@
 
                 $timeout(function(){
                     $scope.solvedOutput = $scope.solve($scope.parsedInput);
-                }, 200);
+                }, 100);
             };
 
             $scope.autoFill = function(card){
@@ -217,6 +225,7 @@
                 return '';
             };
 
+            $scope.rotations = [];
 
             $scope.solve = function(cards2){
                 var cards = cards2.slice();
@@ -259,6 +268,22 @@
                         i = 0;
                     }
                 }
+
+
+                var parts = [];
+                var ogCards = cards2.slice();
+                var r = true;
+                while(ogCards.length && r){
+                    var l = ogCards.length;
+                    parts.push(ogCards.splice(0, Math.ceil(l / 2)));
+                    if(ogCards.length == 1){
+                        parts.push([ogCards[0]]);
+                        r = false;
+                    }
+                }
+
+                $scope.rotations = parts;
+
 
                 return f;
             }
