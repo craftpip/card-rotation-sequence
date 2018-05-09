@@ -1,0 +1,269 @@
+<html>
+<head>
+    <title>Card rotation sequence</title>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"
+          rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
+</head>
+<body ng-app="app">
+
+<div class="container-fluid"
+     style="margin: 0 15px;"
+     ng-controller="appController">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Input card sequence</h4>
+            <p>
+                (H1 (Hearts 1), DK (Diamond King), CJ (Clubs Joker), S3 (Spades 3))
+            </p>
+
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="inputSequence = ''; parseInput(inputSequence)">Clear
+            </button>
+
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="inputSequence = autoFill(); parseInput(inputSequence)">Full-deck
+            </button>
+
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="inputSequence = inputSequence + autoFill('h'); parseInput(inputSequence)">Enter Hearts
+            </button>
+
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="inputSequence = inputSequence + autoFill('d'); parseInput(inputSequence)">Enter Diamond
+            </button>
+
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="inputSequence = inputSequence + autoFill('c'); parseInput(inputSequence)">Enter Clubs
+            </button>
+
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="inputSequence = inputSequence + autoFill('s'); parseInput(inputSequence)">Enter Spades
+            </button>
+
+            <div style="height: 10px;"></div>
+            <input type="text"
+                   placeholder="Input here"
+                   class="form-control"
+                   ng-model="inputSequence"
+                   ng-change="parseInput(inputSequence)">
+
+            <p class=""
+               style="margin-top: 10px;">
+                {{inputDuplicates ? 'You entered duplicate cards' : '----' }}
+            </p>
+
+            <div style="margin-top: 5px;">
+                <div ng-repeat="c in parsedInput track by $index"
+                     class="c">
+                    <div class="t">
+                        <span ng-if="getCardType(c) == 'h'">
+                            &heartsuit;
+                        </span>
+                        <span ng-if="getCardType(c) == 'd'">
+                            &diamondsuit;
+                        </span>
+                        <span ng-if="getCardType(c) == 'c'">
+                            &clubsuit;
+                        </span>
+                        <span ng-if="getCardType(c) == 's'">
+                            &spadesuit;
+                        </span>
+                    </div>
+                    <div class="n">
+                        {{getCardNumber(c)}}
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h4>Output card sequence</h4>
+            <div style="height: 5px"></div>
+            <div style="margin-top: 5px;">
+                <div ng-repeat="c in solvedOutput track by $index"
+                     class="c">
+                    <div class="t">
+                        <span ng-if="getCardType(c) == 'h'">
+                            &heartsuit;
+                        </span>
+                        <span ng-if="getCardType(c) == 'd'">
+                            &diamondsuit;
+                        </span>
+                        <span ng-if="getCardType(c) == 'c'">
+                            &clubsuit;
+                        </span>
+                        <span ng-if="getCardType(c) == 's'">
+                            &spadesuit;
+                        </span>
+                    </div>
+                    <div class="n">
+                        {{getCardNumber(c)}}
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h4>How does it work?</h4>
+
+            <ul>
+                <li>1. Arrange your cards as shown in the Output card sequence.</li>
+                <li>2. Take out one card from the top of the stack.</li>
+                <li>3. Move the top card to the bottom of the same stack.</li>
+                <li>4. Repeat from step 2, until no cards are left.</li>
+                <li>5. You've got yourself The input card sequence.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .c {
+        display: inline-block;
+        text-align: center;
+        width: 30px;
+        padding: 4px;
+        border: solid 1px #ddd;
+        border-radius: 3px;
+        margin-right: 4px;
+        margin-top: 4px;
+        vertical-align: top;
+        animation: in .2s ease-in;
+    }
+
+    @keyframes in {
+        from {
+            opacity: 0;
+            transform: translate(-10px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate(0px, 0);
+        }
+    }
+
+    .c > div:nth-child(1) {
+        font-size: 23px;
+    }
+
+    .c > div:nth-child(2) {
+        text-transform: uppercase;
+    }
+</style>
+
+<script>
+    angular.module('app', []).controller('appController', [
+        '$scope',
+        '$timeout',
+        function($scope, $timeout){
+            $scope.parsedInput = '';
+            $scope.inputDuplicates = false;
+            $scope.solvedOutput = [];
+
+            $scope.parseInput = function(input){
+                if(!input || input.trim() == ''){
+                    $scope.parsedInput = [];
+                }else{
+                    $scope.parsedInput = input.trim().toLowerCase().split(' ');
+                }
+
+                $scope.inputDuplicates = false;
+                $scope.parsedInput.forEach(function(a, i){
+                    $scope.parsedInput.forEach(function(a2, i2){
+                        if(i != i2 && a == a2){
+                            $scope.inputDuplicates = true;
+                        }
+                    });
+                });
+
+                $timeout(function(){
+                    $scope.solvedOutput = $scope.solve($scope.parsedInput);
+                }, 200);
+            };
+
+            $scope.autoFill = function(card){
+                var a = ['h', 'd', 'c', 's'];
+                var b = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k'];
+                var c = '';
+
+                a.forEach(function(a1){
+                    b.forEach(function(b1){
+                        if(!card || card == a1){
+                            c += (a1 + '' + b1 + ' ');
+                        }
+                    });
+                });
+
+                return c;
+            };
+
+            $scope.getCardType = function(c){
+                if(c.length != 0)
+                    return c.split('')[0];
+                return '';
+            };
+
+            $scope.getCardNumber = function(c){
+                if(c.length > 1)
+                    return c.substr(1);
+                return '';
+            };
+
+
+            $scope.solve = function(cards2){
+                var cards = cards2.slice();
+                var f = [];
+                var i = 0;
+                while(i < cards.length){
+                    f[i] = 'x';
+                    i += 1;
+                }
+
+                function hasX(a){
+                    var b = a.join('');
+                    b = b.indexOf('x') != -1;
+                    return b;
+                }
+
+                i = 0;
+                var pointer = 0;
+                var gotX = false;
+                var shouldFill = true;
+
+                while(hasX(f)){
+                    console.log(f);
+
+                    if(f[i] == 'x' && i == 0)
+                        gotX = true;
+
+                    if(f[i] == 'x' && gotX == false){
+                        gotX = true;
+                    }else if(f[i] == 'x' && gotX == true){
+                        var n = cards.splice(0, 1);
+                        f[i] = n[0]
+                        gotX = false;
+                    }
+
+                    i += 1;
+
+                    console.log(f);
+                    if(i >= f.length){
+                        i = 0;
+                    }
+                }
+
+                return f;
+            }
+        }
+    ]);
+</script>
+
+</body>
+</html>
